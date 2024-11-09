@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Resources\AutoArmIcon.ico</ApplicationIcon>
+    <Title>Lynx Auto Arm</Title>
+    <Copyright>2024 Mike Scannell</Copyright>
+    <Company>Happy Pace Timing, LLC</Company>
+    <Authors>Mike Scannell</Authors>
+    <RepositoryUrl>https://github.com/MikeChuckRoast/AutoArm</RepositoryUrl>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\AutoArmIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+</Project>
