@@ -24,6 +24,7 @@ namespace AutoArm
         public Main()
         {
             InitializeComponent();
+            LoadSettings();
             UpdateUiControls(false);
         }
 
@@ -47,6 +48,12 @@ namespace AutoArm
 
             // Update buttons
             UpdateUiControls(false);
+        }
+
+        private void LoadSettings()
+        {
+            udpPortTextBox.Text = Properties.Settings.Default.UdpPort.ToString();
+            delayTextBox.Text = Properties.Settings.Default.Delay.ToString();
         }
 
         private void UpdateUiControls(bool enabled)
@@ -82,6 +89,34 @@ namespace AutoArm
                 return;
             }
             statusValue.Text = status;
+        }
+
+        private void delayTextBox_TextChanged(object sender, EventArgs e)
+        {
+            int delay;
+            if (!int.TryParse(delayTextBox.Text, out delay))
+            {
+                delayTextBox.Text = Properties.Settings.Default.Delay.ToString();
+            }
+            else
+            {
+                Properties.Settings.Default.Delay = delay;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        private void udpPortTextBox_TextChanged(object sender, EventArgs e)
+        {
+            int udpPort;
+            if (!int.TryParse(udpPortTextBox.Text, out udpPort))
+            {
+                udpPortTextBox.Text = Properties.Settings.Default.UdpPort.ToString();
+            }
+            else
+            {
+                Properties.Settings.Default.UdpPort = udpPort;
+                Properties.Settings.Default.Save();
+            }
         }
     }
 }

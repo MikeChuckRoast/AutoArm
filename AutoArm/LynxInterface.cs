@@ -101,7 +101,7 @@ namespace AutoArm
                 if ( autoArmState == AutoArmState.WaitingForStart)
                 {
                     // Waiting for time threshold
-                    mainUi.UpdateArmStatus("Waiting for delay time");
+                    mainUi.UpdateArmStatus("Waiting for delay");
                     autoArmState = AutoArmState.WaitingForDelay;
                 }
                 else if (autoArmState == AutoArmState.WaitingForDelay && timeSeconds >= mainUi.delay)

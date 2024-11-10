@@ -46,7 +46,7 @@
             enableButton.BackColor = Color.Lime;
             enableButton.FlatStyle = FlatStyle.Popup;
             enableButton.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            enableButton.Location = new Point(35, 36);
+            enableButton.Location = new Point(44, 34);
             enableButton.Name = "enableButton";
             enableButton.Size = new Size(100, 32);
             enableButton.TabIndex = 0;
@@ -61,7 +61,7 @@
             disableButton.FlatStyle = FlatStyle.Popup;
             disableButton.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             disableButton.ForeColor = Color.White;
-            disableButton.Location = new Point(166, 36);
+            disableButton.Location = new Point(175, 34);
             disableButton.Name = "disableButton";
             disableButton.Size = new Size(100, 32);
             disableButton.TabIndex = 1;
@@ -118,6 +118,7 @@
             delayTextBox.TabIndex = 6;
             delayTextBox.Text = "3";
             delayTextBox.TextAlign = HorizontalAlignment.Center;
+            delayTextBox.TextChanged += delayTextBox_TextChanged;
             // 
             // lynxStatusValue
             // 
@@ -148,12 +149,13 @@
             udpPortTextBox.TabIndex = 9;
             udpPortTextBox.Text = "8113";
             udpPortTextBox.TextAlign = HorizontalAlignment.Center;
+            udpPortTextBox.TextChanged += udpPortTextBox_TextChanged;
             // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(307, 241);
+            ClientSize = new Size(314, 241);
             Controls.Add(udpPortTextBox);
             Controls.Add(label2);
             Controls.Add(lynxStatusValue);
