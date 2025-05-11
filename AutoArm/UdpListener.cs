@@ -1,6 +1,6 @@
-﻿using System.Net.Sockets;
+﻿using System.Diagnostics;
+using System.Net.Sockets;
 using System.Text;
-using System.Diagnostics;
 
 namespace AutoArm
 {
@@ -13,7 +13,8 @@ namespace AutoArm
         public UdpListener(int port, Action<string> onDataReceived)
         {
             _udpClient = new UdpClient(port);
-            _onDataReceived = onDataReceived ?? throw new ArgumentNullException(nameof(onDataReceived));
+            _onDataReceived =
+                onDataReceived ?? throw new ArgumentNullException(nameof(onDataReceived));
         }
 
         public void Start()

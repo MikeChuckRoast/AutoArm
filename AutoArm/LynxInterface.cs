@@ -2,15 +2,13 @@
 using System.Runtime.InteropServices;
 using AutoArm.Models;
 
-
 namespace AutoArm
 {
-
     public enum AutoArmState
     {
         WaitingForStart,
         WaitingForDelay,
-        KeySent
+        KeySent,
     }
 
     internal class LynxInterface : IDisposable
@@ -18,7 +16,7 @@ namespace AutoArm
         private Main mainUi;
         private UdpListener? udpListener;
         private AutoArmState autoArmState = AutoArmState.WaitingForStart;
- 
+
         public LynxInterface(Main mainUi)
         {
             this.mainUi = mainUi;
@@ -74,7 +72,8 @@ namespace AutoArm
             // Process data
             Debug.WriteLine("Received scoreboard data: " + data);
             // Parse data to ScoreboardData object
-            ScoreboardData? scoreboardData = Newtonsoft.Json.JsonConvert.DeserializeObject<ScoreboardData>(data);
+            ScoreboardData? scoreboardData =
+                Newtonsoft.Json.JsonConvert.DeserializeObject<ScoreboardData>(data);
             if (scoreboardData == null)
             {
                 Debug.WriteLine("Failed to parse scoreboard data.");
@@ -98,13 +97,16 @@ namespace AutoArm
                 var timeSeconds = ConvertTimeToSeconds(scoreboardData.timeRunning);
                 Debug.Print("Time running: " + timeSeconds);
                 mainUi.UpdateLynxStatus("Running: " + scoreboardData.timeRunning);
-                if ( autoArmState == AutoArmState.WaitingForStart)
+                if (autoArmState == AutoArmState.WaitingForStart)
                 {
                     // Waiting for time threshold
                     mainUi.UpdateArmStatus("Waiting for delay");
                     autoArmState = AutoArmState.WaitingForDelay;
                 }
-                else if (autoArmState == AutoArmState.WaitingForDelay && timeSeconds >= mainUi.delay)
+                else if (
+                    autoArmState == AutoArmState.WaitingForDelay
+                    && timeSeconds >= mainUi.delay
+                )
                 {
                     // Time threshold reached
                     autoArmState = AutoArmState.KeySent;
@@ -132,6 +134,6 @@ namespace AutoArm
             var minutes = double.Parse(parts[0]);
             var seconds = double.Parse(parts[1]);
             return minutes * 60 + seconds;
-        }   
+        }
     }
 }

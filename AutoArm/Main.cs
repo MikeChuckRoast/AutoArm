@@ -2,21 +2,14 @@ namespace AutoArm
 {
     public partial class Main : Form
     {
-
         public int udpPort
         {
-            get
-            {
-                return int.Parse(udpPortTextBox.Text);
-            }
+            get { return int.Parse(udpPortTextBox.Text); }
         }
 
         public int delay
         {
-            get
-            {
-                return int.Parse(delayTextBox.Text);
-            }
+            get { return int.Parse(delayTextBox.Text); }
         }
 
         private LynxInterface? lynxInterface;
