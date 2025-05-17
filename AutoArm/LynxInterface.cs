@@ -6,13 +6,25 @@ namespace AutoArm
 {
     public enum AutoArmState
     {
+        Disabled,
         WaitingForStart,
         WaitingForDelay,
-        KeySent,
+        Verified,
+        NotVerified,
+    }
+
+    public enum AutoArmErrorState
+    {
+        AlreadyEnabled,
+        ButtonNotVisible,
+        CaptureNotEnabled,
     }
 
     internal class LynxInterface : IDisposable
     {
+        public event EventHandler<AutoArmState>? AutoArmStateChanged;
+        public event EventHandler<AutoArmErrorState>? AutoArmWarning;
+
         private Main mainUi;
         private UdpListener? udpListener;
         private AutoArmState autoArmState = AutoArmState.WaitingForStart;
@@ -31,7 +43,13 @@ namespace AutoArm
                 udpListener.Dispose();
                 udpListener = null;
             }
-            mainUi.UpdateLynxStatus("Unknown");
+            ArmStateChanged(AutoArmState.Disabled);
+        }
+
+        private void ArmStateChanged(AutoArmState newState)
+        {
+            autoArmState = newState;
+            AutoArmStateChanged?.Invoke(this, newState);
         }
 
         #region SendKeys
@@ -71,12 +89,14 @@ namespace AutoArm
             if (toggleState == ButtonAnalysis.OK)
             {
                 // Capture is already enabled. Not sending toggle
-                mainUi.ShowNotification("Auto Arm", "Capture already enabled");
+                AutoArmWarning?.Invoke(this, AutoArmErrorState.AlreadyEnabled);
+                ArmStateChanged(AutoArmState.Verified);
                 return;
             }
             else if (toggleState == ButtonAnalysis.NOT_GREY)
             {
-                mainUi.ShowNotification("Auto Arm", "Capture button not visible!", ToolTipIcon.Warning);
+                AutoArmWarning?.Invoke(this, AutoArmErrorState.ButtonNotVisible);
+                ArmStateChanged(AutoArmState.NotVerified);
             }
 
             // Send keys
@@ -90,11 +110,17 @@ namespace AutoArm
 
             if (toggleState == ButtonAnalysis.RED)
             {
-                mainUi.ShowNotification("Auto Arm", "Capture not enabled!", ToolTipIcon.Error);
+                AutoArmWarning?.Invoke(this, AutoArmErrorState.CaptureNotEnabled);
+                ArmStateChanged(AutoArmState.NotVerified);
             }
             else if (toggleState == ButtonAnalysis.NOT_GREY)
             {
-                mainUi.ShowNotification("Auto Arm", "Capture button not visible!", ToolTipIcon.Warning);
+                AutoArmWarning?.Invoke(this, AutoArmErrorState.ButtonNotVisible);
+                ArmStateChanged(AutoArmState.NotVerified);
+            }
+            else
+            {
+                ArmStateChanged(AutoArmState.Verified);
             }
         }
 
@@ -135,8 +161,7 @@ namespace AutoArm
                 {
                     mainUi.UpdateLynxStatus("Event not armed");
                 }
-                mainUi.UpdateArmStatus("Waiting for start");
-                autoArmState = AutoArmState.WaitingForStart;
+                ArmStateChanged(AutoArmState.WaitingForStart);
             }
             else if (scoreboardData.timeRunning != null)
             {
@@ -146,8 +171,7 @@ namespace AutoArm
                 if (autoArmState == AutoArmState.WaitingForStart)
                 {
                     // Waiting for time threshold
-                    mainUi.UpdateArmStatus("Waiting for delay");
-                    autoArmState = AutoArmState.WaitingForDelay;
+                    ArmStateChanged(AutoArmState.WaitingForDelay);
                 }
                 else if (
                     autoArmState == AutoArmState.WaitingForDelay
@@ -155,16 +179,13 @@ namespace AutoArm
                 )
                 {
                     // Time threshold reached
-                    autoArmState = AutoArmState.KeySent;
                     ToggleAndVerify();
-                    mainUi.UpdateArmStatus("Capture toggle sent");
                 }
             }
             else
             {
                 mainUi.UpdateLynxStatus("Unknown");
-                mainUi.UpdateArmStatus("Waiting for start");
-                autoArmState = AutoArmState.WaitingForStart;
+                ArmStateChanged(AutoArmState.WaitingForStart);
             }
         }
 

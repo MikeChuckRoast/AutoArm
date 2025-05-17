@@ -74,23 +74,14 @@
                 if (foundButton)
                 {
                     // Create a new rectangle for the button
-                    this.region = new Rectangle(
-                        region.X + buttonX,
-                        region.Y + buttonY,
-                        34,
-                        34
-                    );
+                    this.region = new Rectangle(region.X + buttonX, region.Y + buttonY, 34, 34);
                 }
                 else
                 {
                     // Throw an error
-                    throw new Exception(
-                        "Could not find button in the specified region."
-                    );
+                    throw new Exception("Could not find button in the specified region.");
                 }
-
             }
-
         }
 
         public (ButtonAnalysis, Bitmap) AnalyzeScreen()
@@ -107,6 +98,16 @@
                     region.Y + virtualOrigin.Y
                 ); // Adjust for virtual screen origin
                 g.CopyFromScreen(sourcePoint, Point.Empty, region.Size);
+            }
+
+            // Check for row of pixels at top of button to ensure button is still visible
+            for (int iCol = 0; iCol < 33; iCol++)
+            {
+                Color pixel = bmp.GetPixel(iCol, 0);
+                if (pixel.R != 227 || pixel.G != 227 || pixel.B != 227)
+                {
+                    return (ButtonAnalysis.NOT_GREY, bmp);
+                }
             }
 
             // Check for any red pixels in the region
