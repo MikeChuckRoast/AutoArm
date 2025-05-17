@@ -1,4 +1,6 @@
 using System.Drawing;
+using System.Media;
+using System.Windows.Forms;
 
 namespace AutoArm
 {
@@ -14,19 +16,52 @@ namespace AutoArm
             get { return int.Parse(delayTextBox.Text); }
         }
 
+        private NotifyIcon notifyIcon;
+
         private Rectangle buttonWatchRegion;
 
         private LynxInterface? lynxInterface;
 
-        private LynxButtonWatcher? lynxButtonWatcher;
+        public LynxButtonWatcher? lynxButtonWatcher;
 
         public Main()
         {
             InitializeComponent();
             LoadSettings();
             UpdateUiControls(false);
+            InitializeNotifyIcon();
             InitializeButtonWatcher();
         }
+
+        #region NotifyIcon
+        private void InitializeNotifyIcon()
+        {
+            // Create and configure the NotifyIcon
+            notifyIcon = new NotifyIcon
+            {
+                Icon = SystemIcons.Information, // Use a built-in system icon or your custom icon
+                Visible = true,
+                Text = "AutoArm Notification"
+            };
+        }
+
+        public void ShowNotification(string title, string message, ToolTipIcon icon = ToolTipIcon.Info)
+        {
+            if (notifyIcon != null)
+            {
+                notifyIcon.BalloonTipTitle = title;
+                notifyIcon.BalloonTipText = message;
+                notifyIcon.BalloonTipIcon = icon;
+                notifyIcon.ShowBalloonTip(3000); // Display for 3 seconds
+            }
+        }
+
+        public void UpdateNotifyIcon(AutoArmState status)
+        {
+            notifyIcon.Icon = new Icon("path_to_new_icon.ico");
+        }
+
+        #endregion NotifyIcon
 
         private void InitializeButtonWatcher()
         {

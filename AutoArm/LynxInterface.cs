@@ -52,6 +52,52 @@ namespace AutoArm
             }
         }
 
+        private ButtonAnalysis GetToggleState()
+        {
+            var buttonWatcher = mainUi.lynxButtonWatcher;
+            if (buttonWatcher == null)
+            {
+                Debug.WriteLine("Button watcher not initialized.");
+                return ButtonAnalysis.NOT_GREY;
+            }
+            var (analysis, bitmap) = buttonWatcher.AnalyzeScreen();
+            return analysis;
+        }
+
+        private void ToggleAndVerify()
+        {
+            // Check current state before sending keys. If capture is already enabled, don't send toggle
+            var toggleState = GetToggleState();
+            if (toggleState == ButtonAnalysis.OK)
+            {
+                // Capture is already enabled. Not sending toggle
+                mainUi.ShowNotification("Auto Arm", "Capture already enabled");
+                return;
+            }
+            else if (toggleState == ButtonAnalysis.NOT_GREY)
+            {
+                mainUi.ShowNotification("Auto Arm", "Capture button not visible!", ToolTipIcon.Warning);
+            }
+
+            // Send keys
+            SendKeysToLynx();
+
+            // Wait for a bit to let the keys be sent
+            Thread.Sleep(1000);
+
+            // Check the state again
+            toggleState = GetToggleState();
+
+            if (toggleState == ButtonAnalysis.RED)
+            {
+                mainUi.ShowNotification("Auto Arm", "Capture not enabled!", ToolTipIcon.Error);
+            }
+            else if (toggleState == ButtonAnalysis.NOT_GREY)
+            {
+                mainUi.ShowNotification("Auto Arm", "Capture button not visible!", ToolTipIcon.Warning);
+            }
+        }
+
         #endregion SendKeys
 
         #region ScoreboardListeners
@@ -110,7 +156,7 @@ namespace AutoArm
                 {
                     // Time threshold reached
                     autoArmState = AutoArmState.KeySent;
-                    SendKeysToLynx();
+                    ToggleAndVerify();
                     mainUi.UpdateArmStatus("Capture toggle sent");
                 }
             }
