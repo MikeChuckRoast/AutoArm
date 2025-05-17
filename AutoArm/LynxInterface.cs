@@ -6,13 +6,25 @@ namespace AutoArm
 {
     public enum AutoArmState
     {
+        Disabled,
         WaitingForStart,
         WaitingForDelay,
-        KeySent,
+        Verified,
+        NotVerified,
+    }
+
+    public enum AutoArmErrorState
+    {
+        AlreadyEnabled,
+        ButtonNotVisible,
+        CaptureNotEnabled,
     }
 
     internal class LynxInterface : IDisposable
     {
+        public event EventHandler<AutoArmState>? AutoArmStateChanged;
+        public event EventHandler<AutoArmErrorState>? AutoArmWarning;
+
         private Main mainUi;
         private UdpListener? udpListener;
         private AutoArmState autoArmState = AutoArmState.WaitingForStart;
@@ -31,7 +43,13 @@ namespace AutoArm
                 udpListener.Dispose();
                 udpListener = null;
             }
-            mainUi.UpdateLynxStatus("Unknown");
+            ArmStateChanged(AutoArmState.Disabled);
+        }
+
+        private void ArmStateChanged(AutoArmState newState)
+        {
+            autoArmState = newState;
+            AutoArmStateChanged?.Invoke(this, newState);
         }
 
         #region SendKeys
@@ -49,6 +67,60 @@ namespace AutoArm
                 SetForegroundWindow(h);
                 Debug.Print("Sending keys");
                 SendKeys.SendWait("%t");
+            }
+        }
+
+        private ButtonAnalysis GetToggleState()
+        {
+            var buttonWatcher = mainUi.lynxButtonWatcher;
+            if (buttonWatcher == null)
+            {
+                Debug.WriteLine("Button watcher not initialized.");
+                return ButtonAnalysis.NOT_GREY;
+            }
+            var (analysis, bitmap) = buttonWatcher.AnalyzeScreen();
+            return analysis;
+        }
+
+        private void ToggleAndVerify()
+        {
+            // Check current state before sending keys. If capture is already enabled, don't send toggle
+            var toggleState = GetToggleState();
+            if (toggleState == ButtonAnalysis.OK)
+            {
+                // Capture is already enabled. Not sending toggle
+                AutoArmWarning?.Invoke(this, AutoArmErrorState.AlreadyEnabled);
+                ArmStateChanged(AutoArmState.Verified);
+                return;
+            }
+            else if (toggleState == ButtonAnalysis.NOT_GREY)
+            {
+                AutoArmWarning?.Invoke(this, AutoArmErrorState.ButtonNotVisible);
+                ArmStateChanged(AutoArmState.NotVerified);
+            }
+
+            // Send keys
+            SendKeysToLynx();
+
+            // Wait for a bit to let the keys be sent
+            Thread.Sleep(1000);
+
+            // Check the state again
+            toggleState = GetToggleState();
+
+            if (toggleState == ButtonAnalysis.RED)
+            {
+                AutoArmWarning?.Invoke(this, AutoArmErrorState.CaptureNotEnabled);
+                ArmStateChanged(AutoArmState.NotVerified);
+            }
+            else if (toggleState == ButtonAnalysis.NOT_GREY)
+            {
+                AutoArmWarning?.Invoke(this, AutoArmErrorState.ButtonNotVisible);
+                ArmStateChanged(AutoArmState.NotVerified);
+            }
+            else
+            {
+                ArmStateChanged(AutoArmState.Verified);
             }
         }
 
@@ -89,8 +161,7 @@ namespace AutoArm
                 {
                     mainUi.UpdateLynxStatus("Event not armed");
                 }
-                mainUi.UpdateArmStatus("Waiting for start");
-                autoArmState = AutoArmState.WaitingForStart;
+                ArmStateChanged(AutoArmState.WaitingForStart);
             }
             else if (scoreboardData.timeRunning != null)
             {
@@ -100,8 +171,7 @@ namespace AutoArm
                 if (autoArmState == AutoArmState.WaitingForStart)
                 {
                     // Waiting for time threshold
-                    mainUi.UpdateArmStatus("Waiting for delay");
-                    autoArmState = AutoArmState.WaitingForDelay;
+                    ArmStateChanged(AutoArmState.WaitingForDelay);
                 }
                 else if (
                     autoArmState == AutoArmState.WaitingForDelay
@@ -109,16 +179,13 @@ namespace AutoArm
                 )
                 {
                     // Time threshold reached
-                    autoArmState = AutoArmState.KeySent;
-                    SendKeysToLynx();
-                    mainUi.UpdateArmStatus("Capture toggle sent");
+                    ToggleAndVerify();
                 }
             }
             else
             {
                 mainUi.UpdateLynxStatus("Unknown");
-                mainUi.UpdateArmStatus("Waiting for start");
-                autoArmState = AutoArmState.WaitingForStart;
+                ArmStateChanged(AutoArmState.WaitingForStart);
             }
         }
 

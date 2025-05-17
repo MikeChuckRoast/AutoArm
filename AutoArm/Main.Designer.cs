@@ -39,6 +39,10 @@
             lynxStatusValue = new Label();
             label2 = new Label();
             udpPortTextBox = new TextBox();
+            pictureBox1 = new PictureBox();
+            label3 = new Label();
+            selectButton = new Button();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // enableButton
@@ -134,7 +138,7 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label2.Location = new Point(35, 197);
+            label2.Location = new Point(35, 196);
             label2.Name = "label2";
             label2.Size = new Size(71, 20);
             label2.TabIndex = 8;
@@ -151,11 +155,42 @@
             udpPortTextBox.TextAlign = HorizontalAlignment.Center;
             udpPortTextBox.TextChanged += udpPortTextBox_TextChanged;
             // 
+            // pictureBox1
+            // 
+            pictureBox1.Location = new Point(71, 263);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(34, 34);
+            pictureBox1.TabIndex = 10;
+            pictureBox1.TabStop = false;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label3.Location = new Point(35, 234);
+            label3.Name = "label3";
+            label3.Size = new Size(97, 20);
+            label3.TabIndex = 11;
+            label3.Text = "Button Status";
+            // 
+            // selectButton
+            // 
+            selectButton.Location = new Point(118, 268);
+            selectButton.Name = "selectButton";
+            selectButton.Size = new Size(75, 23);
+            selectButton.TabIndex = 12;
+            selectButton.Text = "Select...";
+            selectButton.UseVisualStyleBackColor = true;
+            selectButton.Click += selectButton_Click;
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(314, 241);
+            ClientSize = new Size(314, 329);
+            Controls.Add(selectButton);
+            Controls.Add(label3);
+            Controls.Add(pictureBox1);
             Controls.Add(udpPortTextBox);
             Controls.Add(label2);
             Controls.Add(lynxStatusValue);
@@ -169,6 +204,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Main";
             Text = "Lynx Auto Arm";
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -185,5 +221,8 @@
         private Label lynxStatusValue;
         private Label label2;
         private TextBox udpPortTextBox;
+        private PictureBox pictureBox1;
+        private Label label3;
+        private Button selectButton;
     }
 }

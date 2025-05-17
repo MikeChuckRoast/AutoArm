@@ -16,6 +16,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\ArmDisabled.ico" />
+    <None Remove="Resources\ArmDone.ico" />
+    <None Remove="Resources\ArmError.ico" />
+    <None Remove="Resources\ArmWait.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\ArmDisabled.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ArmDone.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ArmError.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\ArmWait.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\AutoArmIcon.ico" />
   </ItemGroup>
 
