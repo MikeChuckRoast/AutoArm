@@ -12,7 +12,7 @@ namespace AutoArm.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.13.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -44,6 +44,54 @@ namespace AutoArm.Properties {
             }
             set {
                 this["Delay"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ButtonWatchRegionX {
+            get {
+                return ((int)(this["ButtonWatchRegionX"]));
+            }
+            set {
+                this["ButtonWatchRegionX"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ButtonWatchRegionY {
+            get {
+                return ((int)(this["ButtonWatchRegionY"]));
+            }
+            set {
+                this["ButtonWatchRegionY"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ButtonWatchRegionWidth {
+            get {
+                return ((int)(this["ButtonWatchRegionWidth"]));
+            }
+            set {
+                this["ButtonWatchRegionWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ButtonWatchRegionHeight {
+            get {
+                return ((int)(this["ButtonWatchRegionHeight"]));
+            }
+            set {
+                this["ButtonWatchRegionHeight"] = value;
             }
         }
     }

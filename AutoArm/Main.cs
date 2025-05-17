@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace AutoArm
 {
     public partial class Main : Form
@@ -12,13 +14,39 @@ namespace AutoArm
             get { return int.Parse(delayTextBox.Text); }
         }
 
+        private Rectangle buttonWatchRegion;
+
         private LynxInterface? lynxInterface;
+
+        private LynxButtonWatcher? lynxButtonWatcher;
 
         public Main()
         {
             InitializeComponent();
             LoadSettings();
             UpdateUiControls(false);
+            InitializeButtonWatcher();
+        }
+
+        private void InitializeButtonWatcher()
+        {
+            // If we have saved settings, try initializing the button watcher
+            if (buttonWatchRegion != Rectangle.Empty)
+            {
+                try
+                {
+                    lynxButtonWatcher = new LynxButtonWatcher(buttonWatchRegion);
+                    var (analysis, bitmap) = lynxButtonWatcher.AnalyzeScreen();
+                    pictureBox1.Image = bitmap;
+                }
+                catch { }
+            }
+
+            // If we don't have saved settings, prompt the user to select a region
+            if (lynxButtonWatcher == null)
+            {
+                selectButtonWatchRegion();
+            }
         }
 
         private void EnableButton_Click(object sender, EventArgs e)
@@ -47,6 +75,12 @@ namespace AutoArm
         {
             udpPortTextBox.Text = Properties.Settings.Default.UdpPort.ToString();
             delayTextBox.Text = Properties.Settings.Default.Delay.ToString();
+            buttonWatchRegion = new Rectangle(
+                Properties.Settings.Default.ButtonWatchRegionX,
+                Properties.Settings.Default.ButtonWatchRegionY,
+                Properties.Settings.Default.ButtonWatchRegionWidth,
+                Properties.Settings.Default.ButtonWatchRegionHeight
+            );
         }
 
         private void UpdateUiControls(bool enabled)
@@ -110,6 +144,49 @@ namespace AutoArm
                 Properties.Settings.Default.UdpPort = udpPort;
                 Properties.Settings.Default.Save();
             }
+        }
+
+        private void selectButton_Click(object sender, EventArgs e)
+        {
+            selectButtonWatchRegion();
+        }
+
+        private void selectButtonWatchRegion()
+        {
+            Rectangle region = Rectangle.Empty;
+            using (ScreenSelector selector = new ScreenSelector())
+            {
+                if (selector.ShowDialog() == DialogResult.OK)
+                {
+                    region = selector.SelectedRegion;
+                }
+            }
+            if (region != Rectangle.Empty)
+            {
+                buttonWatchRegion = region;
+                Properties.Settings.Default.ButtonWatchRegionX = region.X;
+                Properties.Settings.Default.ButtonWatchRegionY = region.Y;
+                Properties.Settings.Default.ButtonWatchRegionWidth = region.Width;
+                Properties.Settings.Default.ButtonWatchRegionHeight = region.Height;
+                Properties.Settings.Default.Save();
+
+                try
+                {
+                    lynxButtonWatcher = new LynxButtonWatcher(buttonWatchRegion);
+                    var (analysis, bitmap) = lynxButtonWatcher.AnalyzeScreen();
+                    pictureBox1.Image = bitmap;
+                }
+                catch
+                {
+                    lynxButtonWatcher = null;
+                    MessageBox.Show("Could not find button in selected area. Please try again.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("No region selected.");
+            }
+
         }
     }
 }
