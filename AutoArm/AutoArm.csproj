@@ -12,7 +12,7 @@
     <Company>Happy Pace Timing, LLC</Company>
     <Authors>Mike Scannell</Authors>
     <RepositoryUrl>https://github.com/MikeChuckRoast/AutoArm</RepositoryUrl>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
